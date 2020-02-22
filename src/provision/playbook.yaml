@@ -1,0 +1,47 @@
+---
+- name: Provision
+  hosts: all
+
+  tasks:
+    - name: Install packages
+      apt:
+        name:
+          - npm
+          - composer
+          - git
+        update_cache: true
+      become: true
+
+    - name: Install symfony
+      shell: wget https://get.symfony.com/cli/installer -O - | bash
+
+    - name: Get latest_release
+      uri:
+        url: https://api.github.com/repos/cdr/code-server/releases/latest
+        return_content: yes
+      register: latest_release
+
+    - debug:
+        var: latest_release.json.tag_name
+
+    - name: Download code server
+      unarchive:
+        src: "https://github.com/cdr/code-server/releases/download/{{ latest_release.json.tag_name }}/code-server{{ latest_release.json.tag_name }}-vsc1.41.1-linux-x86_64.tar.gz"
+        dest: "/tmp/"
+        remote_src: true
+
+    - name: Copy code-server bin
+      copy:
+        src: "/tmp/code-server{{ latest_release.json.tag_name }}-vsc1.41.1-linux-x86_64/code-server"
+        dest: /usr/local/bin/code-server
+        remote_src: true
+        mode: '0555'
+      become: true
+
+    - name: Create user
+      user:
+        name: cesarpatinandonet
+        shell: /bin/bash
+        groups: adm,dialout,cdrom,floppy,audio,dip,video,plugdev,netdev,lxd,ubuntu,google-sudoers
+        append: true
+      become: true

@@ -1,0 +1,40 @@
+---
+- name: Create instance
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - include_vars: inventory.gcp.yml
+
+    - name: Terraform apply
+      terraform:
+        project_path: "create-instance/"
+        state: present
+        force_init: true
+        backend_config:
+          bucket: "{{ bucket }}"
+          credentials: "../{{ service_account_file }}"
+        variables:
+          project: "{{ projects | first }}"
+          region: "{{ regions | first }}"
+          credentials: "../{{ service_account_file }}"
+      register: terraform_output
+      until: terraform_output is success
+      retries: 3
+      delay: 5
+
+    - name: Show Terraform output
+      debug:
+        var: terraform_output
+      when: terraform_output.changed
+      tags:
+        - skip_ansible_lint
+        # Tasks that run when changed should likely be handlers
+
+    - meta: refresh_inventory
+    - pause:
+        minutes: 1
+      when: terraform_output.changed
+
+- name: Provision
+  import_playbook: provision/playbook.yaml

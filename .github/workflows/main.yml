@@ -13,4 +13,7 @@ jobs:
         uses: ./ # Uses an action in the root directory
         id: dev-ide
         with:
-          SA_KEY: hola #${{ secrets.SA_KEY }}
+          SA_KEY: ${{ secrets.SA_KEY }}
+          PROJECT: ${{ secrets.PROJECT }}
+          REGION: ${{ secrets.REGION }}
+          BUCKET: ${{ secrets.BUCKET }}
