@@ -1,5 +1,5 @@
 #!/bin/bash
 
-echo $APP_DIR
+echo $INPUT_SA_KEY
 
 #ansible-playbook -i inventory.gcp.yml playbook.yaml

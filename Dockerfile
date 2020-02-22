@@ -1,6 +1,6 @@
 FROM python:3-slim
 
-ENV APP_DIR $1
+ARG INPUT_SA_KEY
 
 WORKDIR /app
 
