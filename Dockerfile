@@ -1,8 +1,15 @@
-# Container image that runs your code
-FROM alpine:3.10
+FROM python:3-slim
 
-# Copies your code file from your action repository to the filesystem path `/` of the container
-COPY entrypoint.sh /entrypoint.sh
+RUN apt-get update \
+      apt-get install ansible terraform python-pip
 
-# Code file to execute when the docker container starts up (`entrypoint.sh`)
-ENTRYPOINT ["/entrypoint.sh"]
+RUN pip install requests google-auth
+
+ENV APP_DIR $1
+
+WORKDIR /app
+
+COPY entrypoint.sh /app/entrypoint.sh
+COPY src/ /app/
+
+ENTRYPOINT ["entrypoint.sh"]

@@ -1,5 +1,5 @@
-#!/bin/sh -l
+#!/bin/bash
 
-echo "Hello $1"
-time=$(date)
-echo ::set-output name=time::$time
+echo $APP_DIR
+
+#ansible-playbook -i inventory.gcp.yml playbook.yaml
