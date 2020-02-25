@@ -26,4 +26,4 @@ COPY entrypoint.sh /app/entrypoint.sh
 
 WORKDIR /github/workspace
 
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["/app/entrypoint.sh"]
