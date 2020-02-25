@@ -13,11 +13,11 @@
         force_init: true
         backend_config:
           bucket: "{{ bucket }}"
-          credentials: "../{{ service_account_file }}"
+          credentials: "{{ lookup('env','GITHUB_WORKSPACE') }}/{{ service_account_file }}"
         variables:
           project: "{{ projects | first }}"
           region: "{{ regions | first }}"
-          credentials: "../{{ service_account_file }}"
+          credentials: "{{ lookup('env','GITHUB_WORKSPACE') }}/{{ service_account_file }}"
       register: terraform_output
       until: terraform_output is success
       retries: 3
