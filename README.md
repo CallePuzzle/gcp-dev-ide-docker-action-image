@@ -1,1 +1,1 @@
-# gcp-dev-ide-docker-action
+# gcp-dev-ide-docker-action-image
