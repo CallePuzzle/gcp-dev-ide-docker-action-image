@@ -4,7 +4,7 @@
   gather_facts: false
 
   tasks:
-    - include_vars: inventory.gcp.yml
+    - include_vars: "{{ lookup('env','GITHUB_WORKSPACE') }}/inventory.gcp.yml"
 
     - name: Terraform apply
       terraform:
