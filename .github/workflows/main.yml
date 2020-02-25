@@ -10,7 +10,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Create dev ide in GCP
-        uses: ./ # Uses an action in the root directory
+        uses: ./action # Uses an action in the root directory
         id: dev-ide
         with:
           SA_KEY: ${{ secrets.SA_KEY }}
