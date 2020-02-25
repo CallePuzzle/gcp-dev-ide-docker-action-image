@@ -18,6 +18,7 @@
           project: "{{ projects | first }}"
           region: "{{ regions | first }}"
           credentials: "../{{ service_account_file }}"
+        binary_path: "{{ lookup('env','HOME') }}/.tfenv/bin/terraform"
       register: terraform_output
       until: terraform_output is success
       retries: 3
@@ -32,9 +33,13 @@
         # Tasks that run when changed should likely be handlers
 
     - meta: refresh_inventory
+
     - pause:
         minutes: 1
       when: terraform_output.changed
+
+    - name: Updating instance ssh metadata
+      shell: 'gcloud --quiet beta compute --project "patinando-run-test" ssh --zone "europe-west1-b" "machine1" --command="exit"'
 
 - name: Provision
   import_playbook: provision/playbook.yaml

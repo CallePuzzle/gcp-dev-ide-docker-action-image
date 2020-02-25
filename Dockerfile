@@ -1,22 +1,33 @@
-FROM python:3-slim
+FROM debian:10-slim
 
-
-ARG INPUT_SA_KEY
-ARG INPUT_PROJECT
-ARG INPUT_REGION
-ARG INPUT_BUCKET
+#ENV INPUT_SA_KEY
+#ENV INPUT_PROJECT
+#ENV INPUT_REGION
+#ENV INPUT_BUCKET
 
 RUN apt-get update
-RUN apt-get install -y ansible python-pip git curl unzip gettext-base
+RUN apt-get install -y python-virtualenv git curl unzip gettext-base gnupg2
 
-RUN pip install requests google-auth
 
-RUN git clone https://github.com/tfutils/tfenv.git ~/.tfenv
-RUN ln -s ~/.tfenv/bin/* /usr/local/bin
-RUN tfenv install 0.12.12
+RUN echo "deb http://packages.cloud.google.com/apt cloud-sdk-buster main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
+    apt-get update -y && apt-get install google-cloud-sdk -y
 
 WORKDIR /app
 
-COPY entrypoint.sh /app/entrypoint.sh
+RUN useradd -ms /bin/bash provision
+RUN chown -R provision.provision /app
+
+USER provision
+
+RUN git clone https://github.com/tfutils/tfenv.git ~/.tfenv
+RUN echo 'export PATH="$HOME/.tfenv/bin:$PATH"' >> ~/.bashrc
+RUN ~/.tfenv/bin/tfenv install 0.12.12
+
+RUN virtualenv -p python3 /app/venv
+RUN /app/venv/bin/pip install ansible requests google-auth
+
+COPY --chown=provision src/ /app/
+COPY --chown=provision entrypoint.sh /app/entrypoint.sh
 
 ENTRYPOINT ["./entrypoint.sh"]
