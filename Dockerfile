@@ -15,19 +15,14 @@ RUN echo "deb http://packages.cloud.google.com/apt cloud-sdk-buster main" | tee 
 
 WORKDIR /app
 
-RUN useradd -ms /bin/bash provision
-RUN chown -R provision.provision /app
-
-USER provision
-
 RUN git clone https://github.com/tfutils/tfenv.git ~/.tfenv
-RUN echo 'export PATH="$HOME/.tfenv/bin:$PATH"' >> ~/.bashrc
-RUN ~/.tfenv/bin/tfenv install 0.12.12
+RUN ln -s ~/.tfenv/bin/* /usr/local/bin
+RUN tfenv install 0.12.12
 
 RUN virtualenv -p python3 /app/venv
 RUN /app/venv/bin/pip install ansible requests google-auth
 
-COPY --chown=provision src/ /app/
-COPY --chown=provision entrypoint.sh /app/entrypoint.sh
+COPY src/ /app/
+COPY entrypoint.sh /app/entrypoint.sh
 
 ENTRYPOINT ["./entrypoint.sh"]

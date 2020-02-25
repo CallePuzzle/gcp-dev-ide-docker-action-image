@@ -18,7 +18,6 @@
           project: "{{ projects | first }}"
           region: "{{ regions | first }}"
           credentials: "../{{ service_account_file }}"
-        binary_path: "{{ lookup('env','HOME') }}/.tfenv/bin/terraform"
       register: terraform_output
       until: terraform_output is success
       retries: 3
