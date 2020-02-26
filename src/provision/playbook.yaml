@@ -23,9 +23,6 @@
         return_content: yes
       register: latest_release
 
-    - debug:
-        var: latest_release.json.tag_name
-
     - name: Download code server
       unarchive:
         src: "https://github.com/cdr/code-server/releases/download/{{ latest_release.json.tag_name }}/code-server{{ latest_release.json.tag_name }}-vsc1.41.1-linux-x86_64.tar.gz"
@@ -42,8 +39,30 @@
 
     - name: Create user
       user:
-        name: cesarpatinandonet
+        name: "{{ lookup('env','INPUT_GITHUB_ACTOR_EMAIL') | regex_replace('@.*') }}"
         shell: /bin/bash
         groups: adm,dialout,cdrom,floppy,audio,dip,video,plugdev,netdev,lxd,ubuntu,google-sudoers
         append: true
+      become: true
+
+    - name: Clone project
+      git:
+        repo: "https://{{ lookup('env','INPUT_GITHUB_ACTOR_EMAIL') | regex_replace('@.*') }}:{{ lookup('env','INPUT_GITHUB_TOKEN') }}@github.com/{{ lookup('env','GITHUB_REPOSITORY') }}"
+        dest: "/home/{{ lookup('env','INPUT_GITHUB_ACTOR_EMAIL') | regex_replace('@.*') }}/{{ lookup('env','GITHUB_REPOSITORY') }}"
+        version: "{{ lookup('env','INPUT_BRANCH_NAME') }}"
+      become: true
+
+    - name: Remove github token
+      ini_file:
+        path: "/home/{{ lookup('env','INPUT_GITHUB_ACTOR_EMAIL') | regex_replace('@.*') }}/{{ lookup('env','GITHUB_REPOSITORY') }}/.git/config"
+        section: 'remote "origin"'
+        option: url
+        value: "https://github.com/{{ lookup('env','GITHUB_REPOSITORY') }}"
+      become: true
+
+    - name: Change owner
+      file:
+        path: "/home/{{ lookup('env','INPUT_GITHUB_ACTOR_EMAIL') | regex_replace('@.*') }}/"
+        owner: "{{ lookup('env','INPUT_GITHUB_ACTOR_EMAIL') | regex_replace('@.*') }}"
+        recurse: yes
       become: true

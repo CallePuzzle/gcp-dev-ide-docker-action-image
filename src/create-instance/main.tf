@@ -23,13 +23,13 @@ resource "google_compute_instance" "cloud-dev-ide-test" {
 
   project = var.project
   zone = random_shuffle.random_zone.result[0]
-  name = "machine1"
-  machine_type = var.instance-type
+  name = var.instance_name
+  machine_type = var.instance_type
   tags = ["code-server"]
 
   boot_disk {
     initialize_params {
-      image = var.instance-image
+      image = var.instance_image
     }
   }
 
@@ -53,6 +53,28 @@ resource "google_compute_instance" "cloud-dev-ide-test" {
   }
 }
 
+terraform {
+  required_version  = "=0.12.12"
+}
+
+variable "project" {
+  type = string
+}
+
+variable "credentials" {
+  type = string
+}
+
+variable "region" {
+  type = string
+  default = "europe-west1"
+}
+
+variable "instance_name" {
+  type = string
+  default = "machine1"
+}
+
 variable "vpc_network_name" {
   type        = string
   default     = "default"
@@ -63,12 +85,12 @@ variable "vpc_subnetwork_name" {
   default     = "default"
 }
 
-variable "instance-type" {
+variable "instance_type" {
   type = string
   default = "g1-small"
 }
 
-variable "instance-image" {
+variable "instance_image" {
   type = string
   default = "ubuntu-os-cloud/ubuntu-1910"
 }
