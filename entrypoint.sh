@@ -2,7 +2,7 @@
 
 set -e
 
-INSTANCE_NAME=$(echo "$GITHUB_REPOSITORY-$INPUT_GITHUB_ACTOR_EMAIL" | perl -ne 'print lc' | perl -pe 's/.*\/(.*)/$1/s' | perl -pe 's/((?![a-z0-9]).)/-/gm')
+INSTANCE_NAME=$(echo "$GITHUB_REPOSITORY-$INPUT_GITHUB_ACTOR_EMAIL" | perl -ne 'print lc' | perl -pe 's/.*\/(.*)/$1/s' | perl -pe 's/"//s' | perl -pe 's/((?![a-z0-9]).)/-/gm' | perl -pe 's/.*(-)$//gm' )
 export INSTANCE_NAME
 
 source /app/venv/bin/activate
