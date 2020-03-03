@@ -94,3 +94,7 @@ variable "instance_image" {
   type = string
   default = "ubuntu-os-cloud/ubuntu-1910"
 }
+
+output "instance_zone" {
+  value = google_compute_instance.cloud-dev-ide-test.zone
+}

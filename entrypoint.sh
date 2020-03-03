@@ -13,3 +13,4 @@ gcloud auth activate-service-account --key-file=service_account.json
 
 cp /app/ansible.cfg ansible.cfg
 ansible-playbook -i inventory.gcp.yml /app/playbook.yaml
+#ansible-playbook -i inventory.gcp.yml /app/delete-instance.yml
