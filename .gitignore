@@ -2,3 +2,4 @@ service_account.json
 .terraform
 inventory.gcp.yml
 src/create-instance/terraform.tfvars
+*test-*
