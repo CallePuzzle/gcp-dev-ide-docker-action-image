@@ -13,8 +13,14 @@
       apt:
         name:
           - git
+          - python3-pip
         update_cache: true
       become: true
+
+    - name: Install supervisor
+      pip:
+        name: supervisor
+        executable: pip3
 
     - name: Get latest_release
       uri:
