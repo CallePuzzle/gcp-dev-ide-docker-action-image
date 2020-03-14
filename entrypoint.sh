@@ -2,7 +2,7 @@
 
 set -e
 
-INSTANCE_NAME=$(echo "$GITHUB_REPOSITORY-$INPUT_BRANCH_NAME" | perl -ne 'print lc' | perl -pe 's/.*\/(.*)/$1/s' | perl -pe 's/"//gm' | perl -pe 's/((?![a-z0-9]).)/-/gm' | perl -pe 's/.*(-)$//gm' )
+INSTANCE_NAME=$(echo "$GITHUB_REPOSITORY-$INPUT_BRANCH_NAME" | perl -ne 'print lc' | perl -pe 's/.*\/(.*)/$1/s' | perl -pe 's/"//gm' | perl -pe 's/((?![a-z0-9]).)/-/gm' | perl -pe 's/.*(-)$//gm' | cut -c -61)
 export INSTANCE_NAME
 
 source /app/venv/bin/activate
