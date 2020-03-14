@@ -1,6 +1,7 @@
 ---
 - name: Provision
   hosts: all
+  become: false
   vars:
     ansible_ssh_private_key_file: "{{ lookup('env','HOME') }}/.ssh/google_compute_engine"
 
@@ -56,7 +57,6 @@
         dest: "/home/{{ github_assignee_user }}/{{ lookup('env','GITHUB_REPOSITORY') }}"
         version: "{{ lookup('env','INPUT_BRANCH_NAME') }}"
       ignore_errors: true
-      become: true
 
     - name: Remove github token
       ini_file:
@@ -64,11 +64,9 @@
         section: 'remote "origin"'
         option: url
         value: "https://github.com/{{ lookup('env','GITHUB_REPOSITORY') }}"
-      become: true
 
     - name: Change owner
       file:
         path: "/home/{{ github_assignee_user }}/"
         owner: "{{ github_assignee_user }}"
         recurse: yes
-      become: true
