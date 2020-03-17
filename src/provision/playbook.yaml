@@ -8,7 +8,7 @@
   tasks:
     - name: Set github assignee user
       set_fact:
-        github_assignee_user: "{{ lookup('env','INPUT_GITHUB_ASSIGNEE_EMAIL') | regex_replace('\"') | regex_replace('@.*') }}"
+        github_assignee_user: "{{ lookup('env','INPUT_GITHUB_ASSIGNEE_LOGIN') }}"
 
     - name: Install packages
       apt:
