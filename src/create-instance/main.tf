@@ -50,6 +50,7 @@ resource "google_compute_instance" "cloud-dev-ide-test" {
 
   labels = {
     service = "cloud-dev-ide"
+    owner = var.instance_owner
   }
 }
 
@@ -93,6 +94,10 @@ variable "instance_type" {
 variable "instance_image" {
   type = string
   default = "ubuntu-os-cloud/ubuntu-1910"
+}
+
+variable "instance_owner" {
+  type = string
 }
 
 output "instance_zone" {

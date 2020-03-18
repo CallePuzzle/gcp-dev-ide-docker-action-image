@@ -20,6 +20,7 @@
           region: "{{ regions | first }}"
           credentials: "{{ lookup('env','GITHUB_WORKSPACE') }}/{{ service_account_file }}"
           instance_name: "{{ instance_name }}"
+          instance_owner: "{{ lookup('env','INPUT_GITHUB_ASSIGNEE_LOGIN') }}"
       register: terraform_output
       until: terraform_output is success
       retries: 3
@@ -40,7 +41,7 @@
       when: terraform_output.changed
 
     - name: Updating instance ssh metadata
-      shell: 'gcloud --quiet beta compute --project "patinando-run-test" ssh --zone "{{ terraform_output.outputs.instance_zone.value }}" "{{ instance_name }}" --command="exit"'
+      shell: 'gcloud --quiet beta compute --project "{{ projects[0] }}" ssh --zone "{{ terraform_output.outputs.instance_zone.value }}" "{{ instance_name }}" --command="exit"'
 
 - name: Provision
   import_playbook: provision/playbook.yaml
