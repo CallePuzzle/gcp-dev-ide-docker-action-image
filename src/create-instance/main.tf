@@ -50,7 +50,8 @@ resource "google_compute_instance" "cloud-dev-ide-test" {
 
   labels = {
     service = "cloud-dev-ide"
-    owner = var.instance_owner
+    # Label value 'BishopVK' violates format constraints. The value can only contain lowercase letters, numeric characters, underscores and dashes. The value can be at most 63 characters long. International characters are allowed
+    # owner = var.instance_owner
   }
 }
 
