@@ -1,0 +1,48 @@
+name: Continuous testing
+on:
+  push:
+    branches:
+      - '*'
+      - '!master'
+
+env:
+  PROJECT_ID: ${{ secrets.CT_PROJECT_ID }}
+  REGION: ${{ secrets.REGION }}
+  BUCKET: ${{ secrets.CT_BUCKET }}
+  SA_KEY: ${{ secrets.CT_SA_KEY }}
+  INSTANCE_TYPE: f1-micro
+  BRANCH_NAME: master
+
+jobs:
+  test-action:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Create dev ide in GCP
+        uses: ./.github/action
+        id: create
+        with:
+          SA_KEY: ${{ env.SA_KEY }}
+          PROJECT: ${{ env.PROJECT_ID }}
+          REGION: ${{ env.REGION }}
+          INSTANCE_TYPE: ${{ env.INSTANCE_TYPE }}
+          BUCKET: ${{ env.BUCKET }}
+          BRANCH_NAME: ${{ env.BRANCH_NAME }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ASSIGNEE_LOGIN: ${{ github.event.repository.owner.login }}
+          PLAYBOOK: /app/playbook.yaml
+
+      - name: Delete dev ide in GCP
+        uses: ./.github/action
+        id: delete
+        with:
+          SA_KEY: ${{ env.SA_KEY }}
+          PROJECT: ${{ env.PROJECT_ID }}
+          REGION: ${{ env.REGION }}
+          INSTANCE_TYPE: ${{ env.INSTANCE_TYPE }}
+          BUCKET: ${{ env.BUCKET }}
+          BRANCH_NAME: ${{ env.BRANCH_NAME }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PLAYBOOK: /app/delete-instance.yaml

@@ -1,0 +1,6 @@
+# action.yml
+name: 'Test gcp-dev-ide-docker-action-image'
+description: 'Test the action gcp-dev-ide-docker'
+runs:
+  using: 'docker'
+  image: '../../Dockerfile'

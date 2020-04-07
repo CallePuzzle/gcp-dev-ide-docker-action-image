@@ -1,0 +1,72 @@
+---
+- name: Provision
+  hosts: all
+  become: false
+  vars:
+    ansible_ssh_private_key_file: "{{ lookup('env','HOME') }}/.ssh/google_compute_engine"
+
+  tasks:
+    - name: Set github assignee user
+      set_fact:
+        github_assignee_user: "{{ lookup('env','INPUT_GITHUB_ASSIGNEE_LOGIN') }}"
+
+    - name: Install packages
+      apt:
+        name:
+          - git
+          - python3-pip
+        update_cache: true
+      become: true
+
+    - name: Install supervisor
+      pip:
+        name: supervisor
+        executable: pip3
+
+    - name: Get latest_release
+      uri:
+        url: https://api.github.com/repos/cdr/code-server/releases/latest
+        return_content: yes
+      register: latest_release
+
+    - name: Download code server
+      unarchive:
+        src: "https://github.com/cdr/code-server/releases/download/{{ latest_release.json.tag_name }}/code-server-{{ latest_release.json.tag_name }}-linux-x86_64.tar.gz"
+        dest: "/tmp/"
+        remote_src: true
+
+    - name: Copy code-server bin
+      copy:
+        src: "/tmp/code-server-{{ latest_release.json.tag_name }}-linux-x86_64/code-server"
+        dest: /usr/local/bin/code-server
+        remote_src: true
+        mode: '0555'
+      become: true
+
+    - name: Create user
+      user:
+        name: "{{ github_assignee_user }}"
+        shell: /bin/bash
+        groups: adm,dialout,cdrom,floppy,audio,dip,video,plugdev,netdev,lxd,ubuntu,google-sudoers
+        append: true
+      become: true
+
+    - name: Clone project
+      git:
+        repo: "https://{{ github_assignee_user }}:{{ lookup('env','INPUT_GITHUB_TOKEN') }}@github.com/{{ lookup('env','GITHUB_REPOSITORY') }}"
+        dest: "/home/{{ github_assignee_user }}/{{ lookup('env','GITHUB_REPOSITORY') }}"
+        version: "{{ lookup('env','INPUT_BRANCH_NAME') }}"
+      ignore_errors: true
+
+    - name: Remove github token
+      ini_file:
+        path: "/home/{{ github_assignee_user }}/{{ lookup('env','GITHUB_REPOSITORY') }}/.git/config"
+        section: 'remote "origin"'
+        option: url
+        value: "https://github.com/{{ lookup('env','GITHUB_REPOSITORY') }}"
+
+    - name: Change owner
+      file:
+        path: "/home/{{ github_assignee_user }}/"
+        owner: "{{ github_assignee_user }}"
+        recurse: yes

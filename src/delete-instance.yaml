@@ -1,0 +1,34 @@
+---
+- name: Create instance
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - include_vars: "{{ lookup('env','GITHUB_WORKSPACE') }}/inventory.gcp.yml"
+
+    - name: Terraform apply
+      terraform:
+        project_path: "create-instance/"
+        state: absent
+        force_init: true
+        backend_config:
+          bucket: "{{ bucket }}"
+          prefix: "{{ instance_name }}"
+          credentials: "{{ lookup('env','GITHUB_WORKSPACE') }}/{{ service_account_file }}"
+        variables:
+          project: "{{ projects | first }}"
+          region: "{{ regions | first }}"
+          credentials: "{{ lookup('env','GITHUB_WORKSPACE') }}/{{ service_account_file }}"
+          instance_name: "{{ instance_name }}"
+      register: terraform_output
+      until: terraform_output is success
+      retries: 3
+      delay: 5
+
+    - name: Show Terraform output
+      debug:
+        var: terraform_output
+      when: terraform_output.changed
+      tags:
+        - skip_ansible_lint
+        # Tasks that run when changed should likely be handlers

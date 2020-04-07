@@ -1,0 +1,15 @@
+---
+plugin: gcp_compute
+projects:
+  - "${INPUT_PROJECT}"
+regions:
+  - "${INPUT_REGION}"
+hostnames:
+  - public_ip
+filters:
+  - labels.service = "cloud-dev-ide"
+  - name = "${INSTANCE_NAME}"
+auth_kind: serviceaccount
+service_account_file: "service_account.json"
+bucket: "${INPUT_BUCKET}"
+instance_name: "${INSTANCE_NAME}"

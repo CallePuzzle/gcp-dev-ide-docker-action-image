@@ -1,0 +1,8 @@
+---
+- name: Test
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Create user
+      debug:
+        msg: "{{ lookup('env','GITHUB_REPOSITORY') | regex_replace('.*/(.*)', '\\1') | lower | regex_replace('((?![a-z0-9]).)', '-') }}"
