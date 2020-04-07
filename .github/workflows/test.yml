@@ -1,6 +1,8 @@
 name: Continuous testing
 on:
   push:
+    branches:
+      - '!master'
 
 env:
   PROJECT_ID: ${{ secrets.CT_PROJECT_ID }}
