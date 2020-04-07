@@ -3,3 +3,4 @@ service_account.json
 inventory.gcp.yml
 src/create-instance/terraform.tfvars
 *test-*
+.google_credentials.env
