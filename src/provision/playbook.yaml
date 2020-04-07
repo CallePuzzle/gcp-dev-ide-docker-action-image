@@ -31,13 +31,13 @@
 
     - name: Download code server
       unarchive:
-        src: "https://github.com/cdr/code-server/releases/download/{{ latest_release.json.tag_name }}/code-server{{ latest_release.json.tag_name }}-vsc1.41.1-linux-x86_64.tar.gz"
+        src: "https://github.com/cdr/code-server/releases/download/{{ latest_release.json.tag_name }}/code-server-{{ latest_release.json.tag_name }}-linux-x86_64.tar.gz"
         dest: "/tmp/"
         remote_src: true
 
     - name: Copy code-server bin
       copy:
-        src: "/tmp/code-server{{ latest_release.json.tag_name }}-vsc1.41.1-linux-x86_64/code-server"
+        src: "/tmp/code-server-{{ latest_release.json.tag_name }}-linux-x86_64/code-server"
         dest: /usr/local/bin/code-server
         remote_src: true
         mode: '0555'
