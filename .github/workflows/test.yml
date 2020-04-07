@@ -7,6 +7,8 @@ env:
   REGION: ${{ secrets.REGION }}
   BUCKET: ${{ secrets.CT_BUCKET }}
   SA_KEY: ${{ secrets.CT_SA_KEY }}
+  INSTANCE_TYPE: f1-micro
+  BRANCH_NAME: master
 
 jobs:
   test-action:
@@ -22,8 +24,9 @@ jobs:
           SA_KEY: ${{ env.SA_KEY }}
           PROJECT: ${{ env.PROJECT_ID }}
           REGION: ${{ env.REGION }}
+          INSTANCE_TYPE: ${{ env.INSTANCE_TYPE }}
           BUCKET: ${{ env.BUCKET }}
-          BRANCH_NAME: master
+          BRANCH_NAME: ${{ env.BRANCH_NAME }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ASSIGNEE_LOGIN: ${{ github.event.repository.owner.login }}
           PLAYBOOK: /app/playbook.yaml
@@ -36,6 +39,6 @@ jobs:
           PROJECT: ${{ secrets.PROJECT }}
           REGION: ${{ secrets.REGION }}
           BUCKET: ${{ secrets.BUCKET }}
-          BRANCH_NAME: master
+          BRANCH_NAME: ${{ env.BRANCH_NAME }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PLAYBOOK: /app/delete-instance.yaml

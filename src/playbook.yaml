@@ -20,7 +20,8 @@
           region: "{{ regions | first }}"
           credentials: "{{ lookup('env','GITHUB_WORKSPACE') }}/{{ service_account_file }}"
           instance_name: "{{ instance_name }}"
-          instance_owner: "{{ lookup('env','INPUT_GITHUB_ASSIGNEE_LOGIN') }}"
+          zone: "{{ lookup('env','INPUT_ZONE') | omit }}"
+          instance_type: "{{ lookup('env','INPUT_INSTANCE_TYPE') | omit }}"
       register: terraform_output
       until: terraform_output is success
       retries: 3
