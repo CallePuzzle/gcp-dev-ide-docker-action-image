@@ -1,14 +1,23 @@
+/*
+** Provider
+*/
 provider "google" {
   project     = var.project
   region      = var.region
   credentials = var.credentials
 }
 
+/*
+** Config
+*/
 terraform {
-  backend "gcs" {
-  }
+  backend "gcs" {}
+  required_version  = ">=0.12.12"
 }
 
+/*
+** Resources
+*/
 data "google_compute_zones" "available_zones" {
   project = var.project
   region = var.region
@@ -22,7 +31,7 @@ resource "random_shuffle" "random_zone" {
 resource "google_compute_instance" "cloud-dev-ide-test" {
 
   project = var.project
-  zone = random_shuffle.random_zone.result[0]
+  zone = var.zone != "" ? var.zone: random_shuffle.random_zone.result[0]
   name = var.instance_name
   machine_type = var.instance_type
   tags = ["code-server"]
@@ -50,57 +59,12 @@ resource "google_compute_instance" "cloud-dev-ide-test" {
 
   labels = {
     service = "cloud-dev-ide"
-    # Label value 'BishopVK' violates format constraints. The value can only contain lowercase letters, numeric characters, underscores and dashes. The value can be at most 63 characters long. International characters are allowed
-    # owner = var.instance_owner
   }
 }
 
-terraform {
-  required_version  = "=0.12.12"
-}
-
-variable "project" {
-  type = string
-}
-
-variable "credentials" {
-  type = string
-}
-
-variable "region" {
-  type = string
-  default = "europe-west1"
-}
-
-variable "instance_name" {
-  type = string
-  default = "machine1"
-}
-
-variable "vpc_network_name" {
-  type        = string
-  default     = "default"
-}
-
-variable "vpc_subnetwork_name" {
-  type        = string
-  default     = "default"
-}
-
-variable "instance_type" {
-  type = string
-  default = "g1-small"
-}
-
-variable "instance_image" {
-  type = string
-  default = "ubuntu-os-cloud/ubuntu-1910"
-}
-
-variable "instance_owner" {
-  type = string
-}
-
+/*
+** Output
+*/
 output "instance_zone" {
   value = google_compute_instance.cloud-dev-ide-test.zone
 }
