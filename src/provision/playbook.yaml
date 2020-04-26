@@ -15,41 +15,24 @@
         name:
           - git
           - python3-pip
+          - docker.io
         update_cache: true
       become: true
 
-    - name: Install supervisor
+    - name: Install docker for python
       pip:
-        name: supervisor
+        name: docker
         executable: pip3
-
-    - name: Get latest_release
-      uri:
-        url: https://api.github.com/repos/cdr/code-server/releases/latest
-        return_content: yes
-      register: latest_release
-
-    - name: Download code server
-      unarchive:
-        src: "https://github.com/cdr/code-server/releases/download/{{ latest_release.json.tag_name }}/code-server-{{ latest_release.json.tag_name }}-linux-x86_64.tar.gz"
-        dest: "/tmp/"
-        remote_src: true
-
-    - name: Copy code-server bin
-      copy:
-        src: "/tmp/code-server-{{ latest_release.json.tag_name }}-linux-x86_64/code-server"
-        dest: /usr/local/bin/code-server
-        remote_src: true
-        mode: '0555'
       become: true
 
     - name: Create user
       user:
         name: "{{ github_assignee_user }}"
         shell: /bin/bash
-        groups: adm,dialout,cdrom,floppy,audio,dip,video,plugdev,netdev,lxd,ubuntu,google-sudoers
+        groups: adm,dialout,cdrom,floppy,audio,dip,video,plugdev,netdev,lxd,ubuntu,google-sudoers,docker
         append: true
       become: true
+      register: user
 
     - name: Clone project
       git:
@@ -70,3 +53,15 @@
         path: "/home/{{ github_assignee_user }}/"
         owner: "{{ github_assignee_user }}"
         recurse: yes
+
+    - name: Execute code-serve
+      docker_container:
+        name: code-server
+        image: codercom/code-server:latest
+        volumes:
+          - "/home/{{ github_assignee_user }}/{{ lookup('env','GITHUB_REPOSITORY') }}:/home/coder/project"
+        ports:
+          - 8080:8080
+        user: "{{ user.uid }}:{{ user.group }}"
+        entrypoint: ["dumb-init", "fixuid", "-q", "/usr/local/bin/code-server", "--auth", "none", "--host", "0.0.0.0", "."]
+      become: true
